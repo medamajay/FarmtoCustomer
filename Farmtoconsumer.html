@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KisanMart – Farm to Your Table</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900:#1a3a1f;--green-700:#2d6a35;--green-500:#4caf50;
+    --green-300:#81c784;--green-100:#e8f5e9;--amber-500:#ff9800;
+    --amber-300:#ffcc02;--red-500:#f44336;--bg:#fafdf7;--surface:#fff;
+    --text:#1a2e1c;--text-muted:#6a7c6d;--border:#d4e8d6;
+    --shadow:0 4px 24px rgba(0,0,0,0.08);--radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  h1,h2,h3{font-family:'Playfair Display',serif;}
+
+  /* NAVBAR */
+  .navbar{background:var(--green-900);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,0.2);}
+  .logo{color:#fff;font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;letter-spacing:-0.5px;cursor:pointer;}
+  .logo span{color:var(--amber-300);}
+  .nav-right{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+  .nav-btn{background:transparent;border:1.5px solid rgba(255,255,255,0.3);color:#fff;padding:0.4rem 1rem;border-radius:8px;cursor:pointer;font-size:0.9rem;transition:all 0.2s;font-family:inherit;}
+  .nav-btn:hover{background:rgba(255,255,255,0.1);}
+  .nav-btn.primary{background:var(--amber-500);border-color:var(--amber-500);color:#000;font-weight:600;}
+  .cart-btn{position:relative;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.3);color:#fff;cursor:pointer;font-size:1.1rem;padding:0.4rem 0.8rem;border-radius:8px;display:flex;align-items:center;gap:0.4rem;}
+  .cart-count{font-size:0.85rem;font-weight:700;}
+  .cart-badge{background:var(--red-500);color:#fff;border-radius:50%;width:18px;height:18px;font-size:0.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .profile-chip{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,0.12);border-radius:20px;padding:.3rem .8rem;color:#fff;font-size:.85rem;cursor:pointer;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--green-500);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;}
+
+  /* LANGUAGE SELECTOR */
+  .lang-selector{position:relative;}
+  .lang-btn{background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.3);color:#fff;padding:.35rem .7rem;border-radius:8px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;gap:.3rem;font-family:inherit;}
+  .lang-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.15);border:1px solid var(--border);min-width:160px;overflow:hidden;z-index:200;}
+  .lang-option{padding:.65rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;font-size:.88rem;transition:background .15s;color:var(--text);}
+  .lang-option:hover{background:var(--green-100);}
+  .lang-option.active{background:var(--green-100);color:var(--green-700);font-weight:600;}
+  .lang-flag{font-size:1rem;}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg,var(--green-900) 0%,var(--green-700) 60%,var(--green-500) 100%);padding:5rem 2rem 4rem;text-align:center;color:#fff;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+  .hero h1{font-size:clamp(2.2rem,6vw,4.5rem);line-height:1.1;margin-bottom:1rem;position:relative;}
+  .hero h1 span{color:var(--amber-300);}
+  .hero p{font-size:1.1rem;opacity:.85;max-width:560px;margin:0 auto 2rem;position:relative;}
+  .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;}
+  .hero-btn{padding:.85rem 2rem;border-radius:12px;border:none;cursor:pointer;font-size:1rem;font-weight:600;transition:transform 0.2s,box-shadow 0.2s;font-family:inherit;}
+  .hero-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+  .hero-btn.primary{background:var(--amber-500);color:#000;}
+  .hero-btn.outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.6);}
+  .stats{display:flex;gap:2rem;justify-content:center;margin-top:3rem;flex-wrap:wrap;position:relative;}
+  .stat{text-align:center;}
+  .stat-num{font-size:2rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--amber-300);}
+  .stat-label{font-size:.85rem;opacity:.7;}
+
+  /* LAYOUT */
+  .container{max-width:1200px;margin:0 auto;padding:0 1.5rem;}
+  .section{padding:3rem 0;}
+
+  /* PRODUCT GRID */
+  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.5rem;}
+  .product-card{background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;border:1px solid var(--border);}
+  .product-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.12);}
+  .product-img{width:100%;height:160px;background:linear-gradient(135deg,var(--green-100),var(--green-300));display:flex;align-items:center;justify-content:center;font-size:4rem;}
+  .product-body{padding:1rem;}
+  .product-name{font-weight:600;font-size:1rem;margin-bottom:.2rem;}
+  .product-farmer{font-size:.78rem;color:var(--text-muted);margin-bottom:.5rem;}
+  .product-meta{display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;}
+  .product-price{font-size:1.15rem;font-weight:700;color:var(--green-700);}
+  .product-stock{font-size:.72rem;color:var(--text-muted);}
+  .badge-organic{background:var(--green-100);color:var(--green-700);font-size:.7rem;font-weight:600;padding:.2rem .5rem;border-radius:4px;display:inline-block;margin-bottom:.4rem;}
+
+  .add-btn{background:var(--green-500);color:#fff;border:none;border-radius:8px;padding:.5rem 1.1rem;cursor:pointer;font-size:.9rem;font-weight:700;transition:background 0.2s,transform 0.15s;letter-spacing:.2px;}
+  .add-btn:hover{background:var(--green-700);transform:scale(1.05);}
+  .add-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .in-cart-btn{background:var(--green-100);color:var(--green-700);border:2px solid var(--green-500);border-radius:8px;padding:.4rem .9rem;cursor:pointer;font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:.3rem;}
+
+  /* FORMS */
+  .form-card{background:var(--surface);border-radius:var(--radius);padding:2.5rem;max-width:480px;margin:3rem auto;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .form-title{text-align:center;margin-bottom:.5rem;font-size:2rem;}
+  .form-sub{text-align:center;color:var(--text-muted);margin-bottom:2rem;font-size:.9rem;}
+  .form-group{margin-bottom:1.2rem;}
+  label{display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px;}
+  input,select,textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--border);border-radius:10px;font-size:.95rem;font-family:inherit;background:var(--bg);color:var(--text);transition:border-color .2s,box-shadow .2s;outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:var(--green-500);box-shadow:0 0 0 3px rgba(76,175,80,0.12);}
+  .btn{width:100%;padding:.85rem;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;}
+  .btn-primary{background:var(--green-700);color:#fff;}
+  .btn-primary:hover{background:var(--green-900);transform:translateY(-1px);}
+  .btn-outline{background:transparent;border:2px solid var(--green-700);color:var(--green-700);margin-top:.75rem;}
+  .btn-outline:hover{background:var(--green-100);}
+  .toggle-link{text-align:center;margin-top:1.5rem;font-size:.9rem;color:var(--text-muted);}
+  .toggle-link span{color:var(--green-700);cursor:pointer;font-weight:600;}
+  .role-select{display:flex;gap:.75rem;margin-bottom:1.5rem;}
+  .role-opt{flex:1;text-align:center;padding:.75rem;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:.9rem;}
+  .role-opt.active{border-color:var(--green-500);background:var(--green-100);color:var(--green-700);font-weight:600;}
+  .role-icon{font-size:1.5rem;display:block;margin-bottom:.3rem;}
+  .alert{padding:.8rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.9rem;}
+  .alert-error{background:#fce8e6;color:#c62828;border:1px solid #ffcdd2;}
+  .alert-success{background:var(--green-100);color:var(--green-700);border:1px solid var(--green-300);}
+
+  /* TABS */
+  .tabs{display:flex;gap:.5rem;margin-bottom:2rem;border-bottom:2px solid var(--border);}
+  .tab{padding:.6rem 1.2rem;border:none;background:none;cursor:pointer;font-size:.95rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;font-weight:500;transition:color .2s;}
+  .tab.active{color:var(--green-700);border-bottom-color:var(--green-700);font-weight:600;}
+
+  /* DASHBOARD */
+  .dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1.2rem;margin-bottom:2rem;}
+  .dash-card{background:var(--surface);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .dash-card-icon{font-size:2rem;margin-bottom:.5rem;}
+  .dash-card-val{font-size:2rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--green-700);}
+  .dash-card-label{font-size:.85rem;color:var(--text-muted);}
+  .data-table{width:100%;border-collapse:collapse;font-size:.9rem;}
+  .data-table th{text-align:left;padding:.75rem 1rem;background:var(--green-100);color:var(--green-700);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;}
+  .data-table td{padding:.75rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .data-table tr:hover td{background:#f5fdf6;}
+  .table-wrap{background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border);overflow-x:auto;}
+  .status-badge{display:inline-block;padding:.25rem .6rem;border-radius:6px;font-size:.75rem;font-weight:600;}
+  .status-pending{background:#fff3e0;color:#e65100;}
+  .status-delivered{background:var(--green-100);color:var(--green-700);}
+  .status-processing{background:#e3f2fd;color:#1565c0;}
+  .status-dispatched{background:#f3e5f5;color:#6a1b9a;}
+  .status-out-for-delivery{background:#fff8e1;color:#f57f17;}
+  .status-verified{background:var(--green-100);color:var(--green-700);}
+  .status-unverified{background:#fce4ec;color:#880e4f;}
+  .status-paid{background:#e8f5e9;color:#2e7d32;}
+
+  /* CART SIDEBAR */
+  .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;}
+  .cart-overlay.open{opacity:1;pointer-events:all;}
+  .cart-sidebar{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);background:var(--surface);z-index:201;transform:translateX(100%);transition:transform .3s cubic-bezier(0.4,0,0.2,1);box-shadow:-8px 0 40px rgba(0,0,0,0.15);display:flex;flex-direction:column;}
+  .cart-sidebar.open{transform:translateX(0);}
+  .cart-header{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--green-900);color:#fff;}
+  .cart-header h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:#fff;}
+  .cart-close{background:rgba(255,255,255,0.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;}
+  .cart-items{flex:1;overflow-y:auto;padding:1rem;}
+  .cart-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+  .cart-item-emoji{font-size:2.2rem;min-width:40px;}
+  .cart-item-info{flex:1;}
+  .cart-item-name{font-weight:600;font-size:.95rem;}
+  .cart-item-farmer{font-size:.75rem;color:var(--text-muted);}
+  .cart-item-price{color:var(--green-700);font-weight:700;font-size:1rem;margin-top:.2rem;}
+  .qty-ctrl{display:flex;align-items:center;gap:.5rem;margin-top:.4rem;}
+  .qty-btn{background:var(--green-100);border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:700;color:var(--green-700);display:flex;align-items:center;justify-content:center;}
+  .qty-val{font-weight:700;min-width:24px;text-align:center;}
+  .remove-btn{background:none;border:none;cursor:pointer;color:#bbb;font-size:1.1rem;padding:.2rem;transition:color .2s;}
+  .remove-btn:hover{color:var(--red-500);}
+  .cart-footer{padding:1.5rem;border-top:1px solid var(--border);}
+  .cart-total{display:flex;justify-content:space-between;font-size:1.15rem;font-weight:700;margin-bottom:1rem;padding:.75rem;background:var(--green-100);border-radius:10px;}
+  .checkout-btn{width:100%;padding:1rem;background:var(--green-700);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;letter-spacing:.3px;}
+  .checkout-btn:hover{background:var(--green-900);}
+
+  /* PAYMENT METHOD STYLES */
+  .payment-section{margin-bottom:1.2rem;}
+  .payment-section-title{font-size:.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem;}
+  .payment-options{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+  .payment-opt{border:2px solid var(--border);border-radius:10px;padding:.65rem .75rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:all .2s;font-size:.85rem;font-weight:500;background:#fff;}
+  .payment-opt:hover{border-color:var(--green-300);}
+  .payment-opt.selected{border-color:var(--green-500);background:var(--green-100);color:var(--green-700);}
+  .payment-icon{font-size:1.2rem;}
+  .payment-details{background:#f8fffe;border:1px solid var(--green-200,#c8e6c9);border-radius:10px;padding:.9rem;margin-top:.5rem;font-size:.82rem;color:var(--text-muted);}
+  .upi-input{display:flex;gap:.4rem;margin-top:.5rem;}
+  .upi-input input{flex:1;padding:.5rem .75rem;font-size:.85rem;border:1.5px solid var(--border);border-radius:8px;}
+  .upi-verify-btn{padding:.5rem .9rem;background:var(--green-500);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:700;}
+
+  /* SEARCH */
+  .search-bar{display:flex;gap:.75rem;margin-bottom:2rem;flex-wrap:wrap;align-items:center;}
+  .search-input{flex:1;min-width:200px;padding:.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:.95rem;font-family:inherit;background:var(--surface);outline:none;}
+  .search-input:focus{border-color:var(--green-500);}
+  .filter-select{padding:.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:.9rem;background:var(--surface);cursor:pointer;outline:none;}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;}
+  .modal{background:var(--surface);border-radius:var(--radius);padding:2rem;max-width:520px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;}
+  .modal-title{font-size:1.5rem;margin-bottom:1.5rem;}
+  .modal-actions{display:flex;gap:.75rem;margin-top:1.5rem;}
+  .btn-danger{background:var(--red-500);color:#fff;border:none;padding:.75rem 1.5rem;border-radius:10px;cursor:pointer;font-weight:600;font-family:inherit;}
+  .btn-secondary{background:var(--border);color:var(--text);border:none;padding:.75rem 1.5rem;border-radius:10px;cursor:pointer;font-weight:600;font-family:inherit;}
+  .btn-sm{padding:.4rem .8rem;border:none;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600;font-family:inherit;}
+  .btn-sm-primary{background:var(--green-500);color:#fff;}
+  .btn-sm-danger{background:var(--red-500);color:#fff;}
+  .btn-sm-warning{background:var(--amber-500);color:#000;}
+
+  /* LIVE TRACKING MAP */
+  .live-tracking-map{background:linear-gradient(160deg,#e8f5e9 0%,#c8e6c9 100%);border-radius:12px;height:220px;position:relative;overflow:hidden;margin:1rem 0;border:1px solid var(--border);}
+  .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(76,175,80,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(76,175,80,0.08) 1px,transparent 1px);background-size:30px 30px;}
+  .map-road-h{position:absolute;left:0;right:0;height:8px;background:rgba(255,255,255,0.7);border-radius:4px;}
+  .map-road-v{position:absolute;top:0;bottom:0;width:8px;background:rgba(255,255,255,0.7);border-radius:4px;}
+  .map-pin{position:absolute;font-size:1.8rem;transform:translate(-50%,-100%);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));transition:left 1.5s ease-in-out, top 1.5s ease-in-out;}
+  .map-dest{position:absolute;font-size:1.5rem;transform:translate(-50%,-100%);}
+  .map-pulse{position:absolute;width:20px;height:20px;background:rgba(76,175,80,0.3);border-radius:50%;transform:translate(-50%,-50%);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1;}50%{transform:translate(-50%,-50%) scale(2.5);opacity:0;}}
+  .tracking-eta{background:rgba(255,255,255,0.9);border-radius:8px;padding:.5rem .8rem;position:absolute;top:.5rem;right:.5rem;font-size:.78rem;font-weight:700;color:var(--green-700);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+  .delivery-partner{background:rgba(255,255,255,0.9);border-radius:8px;padding:.5rem .8rem;position:absolute;bottom:.5rem;left:.5rem;font-size:.75rem;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.1);display:flex;align-items:center;gap:.4rem;}
+
+  /* ORDER TRACKING */
+  .tracking-steps{display:flex;gap:0;margin:1.5rem 0 0;}
+  .track-step{flex:1;text-align:center;position:relative;}
+  .track-step::before{content:'';position:absolute;top:20px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0;}
+  .track-step:last-child::before{display:none;}
+  .track-dot{width:40px;height:40px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-size:.9rem;position:relative;z-index:1;transition:background .3s;}
+  .track-dot.done{background:var(--green-500);color:#fff;}
+  .track-dot.active{background:var(--amber-500);color:#fff;box-shadow:0 0 0 4px rgba(255,152,0,0.25);}
+  .track-label{font-size:.7rem;color:var(--text-muted);}
+  .track-label.done{color:var(--green-700);font-weight:600;}
+  .live-badge{display:inline-flex;align-items:center;gap:.3rem;background:#ff4444;color:#fff;border-radius:20px;padding:.2rem .6rem;font-size:.7rem;font-weight:700;animation:livePulse 1.5s infinite;}
+  @keyframes livePulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+  .live-dot{width:6px;height:6px;background:#fff;border-radius:50%;}
+
+  /* TOAST NOTIFICATION */
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--green-900);color:#fff;padding:1rem 1.5rem;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:999;font-weight:500;display:flex;align-items:center;gap:.75rem;animation:toastIn .35s cubic-bezier(0.34,1.56,0.64,1);}
+  @keyframes toastIn{from{transform:translateY(80px) scale(0.8);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
+  .toast-icon{font-size:1.3rem;}
+
+  /* MISC */
+  .empty-state{text-align:center;padding:4rem 2rem;color:var(--text-muted);}
+  .empty-state-icon{font-size:4rem;margin-bottom:1rem;}
+  .chip{display:inline-block;padding:.3rem .75rem;border-radius:20px;font-size:.8rem;font-weight:600;background:var(--green-100);color:var(--green-700);}
+  .page-header{background:var(--green-900);color:#fff;padding:2.5rem 2rem;}
+  .page-header h1{font-size:2rem;}
+  .page-header p{opacity:.7;margin-top:.3rem;}
+  .flex-between{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .action-bar{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .tag{display:inline-block;background:var(--green-100);color:var(--green-700);padding:.15rem .5rem;border-radius:4px;font-size:.75rem;}
+  textarea{resize:vertical;min-height:80px;}
+  .login-prompt{background:#fff3e0;border:2px solid var(--amber-500);border-radius:10px;padding:.75rem 1rem;text-align:center;margin:1.5rem 0;font-size:.9rem;color:#e65100;}
+  .login-prompt strong{cursor:pointer;text-decoration:underline;}
+  .persist-note{background:var(--green-100);border:1px solid var(--green-300);border-radius:8px;padding:.6rem 1rem;font-size:.8rem;color:var(--green-700);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+
+  /* PAYMENT MODAL */
+  .payment-modal{max-width:440px;}
+  .pay-summary{background:var(--green-100);border-radius:10px;padding:1rem;margin-bottom:1.2rem;}
+  .pay-summary-row{display:flex;justify-content:space-between;font-size:.9rem;padding:.2rem 0;}
+  .pay-summary-total{font-weight:700;font-size:1.1rem;border-top:1px solid var(--border);padding-top:.5rem;margin-top:.5rem;}
+  .pay-btn{width:100%;padding:.9rem;background:var(--green-700);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:.75rem;}
+  .pay-btn:hover{background:var(--green-900);}
+  .pay-btn.success{background:#2e7d32;}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+  .card-row{grid-column:span 2;}
+
+  @media(max-width:600px){
+    .navbar{padding:0 1rem;}
+    .hero{padding:3rem 1rem 2.5rem;}
+    .form-card{margin:1.5rem 1rem;padding:1.5rem;}
+    .tracking-steps{flex-direction:column;gap:1rem;}
+    .track-step::before{display:none;}
+    .nav-right{gap:.4rem;}
+    .nav-btn{padding:.35rem .7rem;font-size:.8rem;}
+    .payment-options{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ══════════════════════════════════════════════════════
+// LANGUAGE DEFINITIONS
+// ══════════════════════════════════════════════════════
+const LANGUAGES = {
+  en: {
+    flag:"🇬🇧", name:"English",
+    shopNow:"Shop Now 🛒", joinFarmer:"Join as Farmer 🌾",
+    verifiedFarmers:"Verified Farmers", products:"Products",
+    happyConsumers:"Happy Consumers", middlemen:"Middlemen",
+    featuredProducts:"Featured Products", freshPicks:"Fresh picks from our farmers today",
+    viewAll:"View All →", areYouFarmer:"Are you a Farmer?",
+    farmerDesc:"Register, get verified, and start selling directly to thousands of consumers.",
+    registerFarmer:"Register as Farmer 🌾", shop:"Shop", orders:"Orders",
+    dashboard:"Dashboard", admin:"Admin", signIn:"Sign In", register:"Register",
+    logout:"Logout", addToCart:"Add 🛒", buy:"Buy", inCart:"In Cart",
+    addMore:"+ Add More", soldOut:"Sold Out", organic:"🌿 Organic",
+    byFarmer:"by", available:"available", outOfStock:"Out of stock",
+    heroTitle:"Fresh from the Farm,", heroSpan:"Straight to Your Table",
+    heroDesc:"Buy directly from local farmers. No middlemen. Fair prices. Fresher produce.",
+    paymentMethod:"Payment Method", selectPayment:"Select how you'd like to pay",
+    upi:"UPI", card:"Card", cod:"Cash on Delivery", netbanking:"Net Banking",
+    placeOrder:"Place Order", orderTotal:"Order Total",
+    liveTracking:"Live Tracking 📍", trackYourOrder:"Track your order in real-time",
+    estimatedArrival:"Estimated Arrival", deliveryPartner:"Delivery Partner",
+    myOrders:"My Orders 📦", trackFarmToDoor:"Track your purchases from farm to door",
+  },
+  hi: {
+    flag:"🇮🇳", name:"हिंदी",
+    shopNow:"अभी खरीदें 🛒", joinFarmer:"किसान के रूप में जुड़ें 🌾",
+    verifiedFarmers:"सत्यापित किसान", products:"उत्पाद",
+    happyConsumers:"संतुष्ट उपभोक्ता", middlemen:"बिचौलिये",
+    featuredProducts:"विशेष उत्पाद", freshPicks:"आज हमारे किसानों से ताज़ी चुनाव",
+    viewAll:"सभी देखें →", areYouFarmer:"क्या आप किसान हैं?",
+    farmerDesc:"पंजीकरण करें, सत्यापित हों, और हजारों उपभोक्ताओं को सीधे बेचना शुरू करें।",
+    registerFarmer:"किसान के रूप में पंजीकरण 🌾", shop:"दुकान", orders:"ऑर्डर",
+    dashboard:"डैशबोर्ड", admin:"व्यवस्थापक", signIn:"साइन इन", register:"पंजीकरण",
+    logout:"लॉग आउट", addToCart:"कार्ट में जोड़ें 🛒", buy:"खरीदें", inCart:"कार्ट में",
+    addMore:"+ और जोड़ें", soldOut:"स्टॉक खत्म", organic:"🌿 जैविक",
+    byFarmer:"द्वारा", available:"उपलब्ध", outOfStock:"स्टॉक नहीं",
+    heroTitle:"खेत से सीधे,", heroSpan:"आपकी थाली तक",
+    heroDesc:"स्थानीय किसानों से सीधे खरीदें। कोई बिचौलिया नहीं। उचित मूल्य। ताज़ा उत्पाद।",
+    paymentMethod:"भुगतान विधि", selectPayment:"भुगतान का तरीका चुनें",
+    upi:"UPI", card:"कार्ड", cod:"कैश ऑन डिलीवरी", netbanking:"नेट बैंकिंग",
+    placeOrder:"ऑर्डर दें", orderTotal:"कुल राशि",
+    liveTracking:"लाइव ट्रैकिंग 📍", trackYourOrder:"अपने ऑर्डर को रियल-टाइम में ट्रैक करें",
+    estimatedArrival:"अनुमानित आगमन", deliveryPartner:"डिलीवरी पार्टनर",
+    myOrders:"मेरे ऑर्डर 📦", trackFarmToDoor:"खेत से दरवाजे तक अपनी खरीदारी ट्रैक करें",
+  },
+  te: {
+    flag:"🏳️", name:"తెలుగు",
+    shopNow:"ఇప్పుడు కొనుగోలు 🛒", joinFarmer:"రైతుగా చేరండి 🌾",
+    verifiedFarmers:"ధృవీకరించిన రైతులు", products:"ఉత్పత్తులు",
+    happyConsumers:"సంతోషకర వినియోగదారులు", middlemen:"మధ్యవర్తులు",
+    featuredProducts:"ముఖ్య ఉత్పత్తులు", freshPicks:"నేడు మా రైతుల నుండి తాజా ఎంపికలు",
+    viewAll:"అన్నీ చూడండి →", areYouFarmer:"మీరు రైతా?",
+    farmerDesc:"నమోదు చేసుకోండి, ధృవీకరించుకోండి, వేలాది వినియోగదారులకు నేరుగా విక్రయించండి.",
+    registerFarmer:"రైతుగా నమోదు 🌾", shop:"దుకాణం", orders:"ఆర్డర్లు",
+    dashboard:"డాష్‌బోర్డ్", admin:"అడ్మిన్", signIn:"సైన్ ఇన్", register:"నమోదు",
+    logout:"లాగ్ అవుట్", addToCart:"కార్ట్‌కు జోడించు 🛒", buy:"కొనుగోలు", inCart:"కార్ట్‌లో",
+    addMore:"+ మరింత జోడించు", soldOut:"స్టాక్ అయిపోయింది", organic:"🌿 సేంద్రీయ",
+    byFarmer:"ద్వారా", available:"అందుబాటులో", outOfStock:"స్టాక్ లేదు",
+    heroTitle:"పొలం నుండి నేరుగా,", heroSpan:"మీ భోజనపు పళ్ళేనికి",
+    heroDesc:"స్థానిక రైతుల నుండి నేరుగా కొనుగోలు చేయండి. మధ్యవర్తులు లేరు. న్యాయమైన ధరలు.",
+    paymentMethod:"చెల్లింపు విధానం", selectPayment:"చెల్లింపు పద్ధతిని ఎంచుకోండి",
+    upi:"UPI", card:"కార్డ్", cod:"డెలివరీపై నగదు", netbanking:"నెట్ బ్యాంకింగ్",
+    placeOrder:"ఆర్డర్ ఇవ్వండి", orderTotal:"మొత్తం",
+    liveTracking:"లైవ్ ట్రాకింగ్ 📍", trackYourOrder:"మీ ఆర్డర్‌ను నిజ సమయంలో ట్రాక్ చేయండి",
+    estimatedArrival:"అంచనా రాకడ", deliveryPartner:"డెలివరీ పార్టనర్",
+    myOrders:"నా ఆర్డర్లు 📦", trackFarmToDoor:"పొలం నుండి తలుపు వరకు ట్రాక్ చేయండి",
+  },
+  mr: {
+    flag:"🏳️", name:"मराठी",
+    shopNow:"आता खरेदी करा 🛒", joinFarmer:"शेतकरी म्हणून सामील व्हा 🌾",
+    verifiedFarmers:"सत्यापित शेतकरी", products:"उत्पादने",
+    happyConsumers:"आनंदी ग्राहक", middlemen:"दलाल",
+    featuredProducts:"वैशिष्ट्यीकृत उत्पादने", freshPicks:"आजच्या ताज्या निवडी",
+    viewAll:"सर्व पहा →", areYouFarmer:"तुम्ही शेतकरी आहात का?",
+    farmerDesc:"नोंदणी करा, सत्यापित व्हा आणि हजारो ग्राहकांना थेट विकणे सुरू करा.",
+    registerFarmer:"शेतकरी म्हणून नोंदणी 🌾", shop:"दुकान", orders:"ऑर्डर",
+    dashboard:"डॅशबोर्ड", admin:"प्रशासक", signIn:"साइन इन", register:"नोंदणी",
+    logout:"लॉग आउट", addToCart:"कार्टमध्ये जोडा 🛒", buy:"खरेदी करा", inCart:"कार्टमध्ये",
+    addMore:"+ आणखी जोडा", soldOut:"साठा संपला", organic:"🌿 सेंद्रिय",
+    byFarmer:"द्वारे", available:"उपलब्ध", outOfStock:"साठा नाही",
+    heroTitle:"शेतातून थेट,", heroSpan:"तुमच्या ताटात",
+    heroDesc:"स्थानिक शेतकऱ्यांकडून थेट खरेदी करा. दलाल नाही. योग्य भाव. ताजी उत्पादने.",
+    paymentMethod:"पेमेंट पद्धत", selectPayment:"पेमेंट कसे करायचे ते निवडा",
+    upi:"UPI", card:"कार्ड", cod:"रोख डिलिव्हरी", netbanking:"नेट बँकिंग",
+    placeOrder:"ऑर्डर द्या", orderTotal:"एकूण",
+    liveTracking:"लाइव्ह ट्रॅकिंग 📍", trackYourOrder:"तुमचा ऑर्डर रिअल-टाइममध्ये ट्रॅक करा",
+    estimatedArrival:"अंदाजे आगमन", deliveryPartner:"डिलिव्हरी पार्टनर",
+    myOrders:"माझे ऑर्डर 📦", trackFarmToDoor:"शेतापासून दरवाजापर्यंत ट्रॅक करा",
+  },
+};
+
+// ══════════════════════════════════════════════════════
+// 1. LOCALSTORAGE HELPERS
+// ══════════════════════════════════════════════════════
+const LS = {
+  get: (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set: (k, v)  => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+// ══════════════════════════════════════════════════════
+// 2. SEED DATA
+// ══════════════════════════════════════════════════════
+const SEED_PRODUCTS = [
+  {id:1,name:"Fresh Tomatoes",emoji:"🍅",price:35,unit:"kg",stock:50,category:"Vegetables",farmerId:2,farmerName:"Ramu Patel",organic:true,description:"Sun-ripened, juicy tomatoes."},
+  {id:2,name:"Spinach",emoji:"🥬",price:25,unit:"bunch",stock:30,category:"Leafy Greens",farmerId:2,farmerName:"Ramu Patel",organic:true,description:"Fresh green spinach leaves."},
+  {id:3,name:"Potatoes",emoji:"🥔",price:20,unit:"kg",stock:100,category:"Vegetables",farmerId:3,farmerName:"Sunita Devi",organic:false,description:"Farm-fresh potatoes."},
+  {id:4,name:"Onions",emoji:"🧅",price:40,unit:"kg",stock:80,category:"Vegetables",farmerId:3,farmerName:"Sunita Devi",organic:false,description:"Premium quality onions."},
+  {id:5,name:"Carrots",emoji:"🥕",price:30,unit:"kg",stock:40,category:"Vegetables",farmerId:2,farmerName:"Ramu Patel",organic:true,description:"Sweet, crunchy organic carrots."},
+  {id:6,name:"Cauliflower",emoji:"🥦",price:45,unit:"piece",stock:25,category:"Vegetables",farmerId:4,farmerName:"Vikram Singh",organic:false,description:"Large fresh cauliflower heads."},
+  {id:7,name:"Mangoes",emoji:"🥭",price:120,unit:"kg",stock:20,category:"Fruits",farmerId:4,farmerName:"Vikram Singh",organic:true,description:"Alphonso mangoes from the orchard."},
+  {id:8,name:"Brinjal",emoji:"🍆",price:28,unit:"kg",stock:35,category:"Vegetables",farmerId:3,farmerName:"Sunita Devi",organic:false,description:"Glossy purple brinjals."},
+  {id:9,name:"Bitter Gourd",emoji:"🫑",price:32,unit:"kg",stock:22,category:"Vegetables",farmerId:2,farmerName:"Ramu Patel",organic:true,description:"Organic bitter gourd, farm fresh."},
+  {id:10,name:"Bananas",emoji:"🍌",price:50,unit:"dozen",stock:60,category:"Fruits",farmerId:3,farmerName:"Sunita Devi",organic:false,description:"Sweet ripe bananas."},
+];
+const SEED_USERS = [
+  {id:1,name:"Admin Kumar",email:"admin@kisanmart.com",password:"admin123",role:"admin",verified:true,joinDate:"2024-01-01"},
+  {id:2,name:"Ramu Patel",email:"ramu@farm.com",password:"farmer123",role:"farmer",verified:true,location:"Pune, Maharashtra",joinDate:"2024-02-15"},
+  {id:3,name:"Sunita Devi",email:"sunita@farm.com",password:"farmer123",role:"farmer",verified:true,location:"Nashik, Maharashtra",joinDate:"2024-03-10"},
+  {id:4,name:"Vikram Singh",email:"vikram@farm.com",password:"farmer123",role:"farmer",verified:false,location:"Hyderabad, Telangana",joinDate:"2024-06-01"},
+  {id:5,name:"Priya Consumer",email:"priya@gmail.com",password:"consumer123",role:"consumer",verified:true,joinDate:"2024-04-20"},
+];
+const SEED_ORDERS = [
+  {id:"ORD001",consumerId:5,consumerName:"Priya Consumer",items:[{productId:1,name:"Fresh Tomatoes",emoji:"🍅",qty:2,price:35}],total:70,status:"Out for Delivery",date:"2024-06-01",farmerId:2,paymentMethod:"UPI",paymentStatus:"Paid"},
+];
+
+function initLS() {
+  if (!localStorage.getItem("km_users"))    LS.set("km_users",    SEED_USERS);
+  if (!localStorage.getItem("km_products")) LS.set("km_products", SEED_PRODUCTS);
+  if (!localStorage.getItem("km_orders"))   LS.set("km_orders",   SEED_ORDERS);
+}
+initLS();
+
+const genId    = arr => arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1;
+const genOrdId = orders => "ORD"+String(orders.length+1).padStart(3,"0");
+const CATEGORIES = ["All","Vegetables","Fruits","Leafy Greens"];
+
+// ══════════════════════════════════════════════════════
+// LANGUAGE SELECTOR COMPONENT
+// ══════════════════════════════════════════════════════
+function LangSelector({lang, setLang}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(()=>{
+    const h = e => { if(ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return ()=>document.removeEventListener("mousedown", h);
+  },[]);
+  return (
+    <div className="lang-selector" ref={ref}>
+      <button className="lang-btn" onClick={()=>setOpen(o=>!o)}>
+        <span>{LANGUAGES[lang].flag}</span>
+        <span>{LANGUAGES[lang].name}</span>
+        <span style={{opacity:.6}}>▾</span>
+      </button>
+      {open && (
+        <div className="lang-dropdown">
+          {Object.entries(LANGUAGES).map(([code, l]) => (
+            <div key={code} className={`lang-option ${lang===code?"active":""}`}
+              onClick={()=>{setLang(code);LS.set("km_lang",code);setOpen(false);}}>
+              <span className="lang-flag">{l.flag}</span>
+              <span>{l.name}</span>
+              {lang===code && <span style={{marginLeft:"auto"}}>✓</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// LIVE TRACKING MAP COMPONENT
+// ══════════════════════════════════════════════════════
+function LiveTrackingMap({order, t}) {
+  const [pos, setPos] = useState({x:15, y:70});
+  const [eta, setEta] = useState(22);
+  const isActive = order.status === "Out for Delivery" || order.status === "Dispatched";
+
+  useEffect(()=>{
+    if(!isActive) return;
+    const interval = setInterval(()=>{
+      setPos(p=>({
+        x: Math.min(80, p.x + (Math.random()*3 - 0.5)),
+        y: Math.max(20, p.y - (Math.random()*2))
+      }));
+      setEta(e=>Math.max(2, e - 1));
+    }, 2000);
+    return ()=>clearInterval(interval);
+  },[isActive]);
+
+  const partners = ["Rajesh Kumar 🛵","Amit Singh 🛵","Pradeep Das 🛵"];
+  const partner  = partners[parseInt(order.id.replace("ORD",""))%3];
+
+  return (
+    <div>
+      <div style={{display:"flex",alignItems:"center",gap:".5rem",marginBottom:".5rem"}}>
+        <span style={{fontWeight:700,fontSize:".95rem"}}>{t.liveTracking}</span>
+        {isActive && <span className="live-badge"><span className="live-dot"/>LIVE</span>}
+      </div>
+      <div className="live-tracking-map">
+        <div className="map-grid"/>
+        {/* Roads */}
+        <div className="map-road-h" style={{top:"30%"}}/>
+        <div className="map-road-h" style={{top:"65%"}}/>
+        <div className="map-road-v" style={{left:"40%"}}/>
+        <div className="map-road-v" style={{left:"70%"}}/>
+
+        {/* Destination pin */}
+        <div className="map-dest" style={{right:"12%",top:"18%"}}>🏠</div>
+        <div className="map-pulse" style={{right:"calc(12% - 4px)",top:"calc(18% + 2px)"}}/>
+
+        {/* Delivery vehicle */}
+        {isActive && (
+          <div className="map-pin" style={{left:`${pos.x}%`,top:`${pos.y}%`}}>🛵</div>
+        )}
+        {!isActive && order.status==="Delivered" && (
+          <div style={{position:"absolute",right:"12%",top:"18%",fontSize:"1.5rem",transform:"translate(-50%,-100%)"}}>✅</div>
+        )}
+
+        {/* ETA badge */}
+        {isActive && (
+          <div className="tracking-eta">⏱ {eta} min away</div>
+        )}
+        {order.status==="Delivered" && (
+          <div className="tracking-eta" style={{background:"var(--green-100)",color:"var(--green-700)"}}>✅ Delivered!</div>
+        )}
+
+        {/* Delivery partner */}
+        {isActive && (
+          <div className="delivery-partner">
+            <span>🛵</span>
+            <div><div style={{fontWeight:600,fontSize:".78rem"}}>{partner}</div><div style={{fontSize:".7rem",color:"var(--text-muted)"}}>Your delivery partner</div></div>
+          </div>
+        )}
+      </div>
+      {isActive && (
+        <div style={{display:"flex",gap:"1rem",fontSize:".82rem",color:"var(--text-muted)",marginTop:".4rem"}}>
+          <span>📍 Current: NH-65, Hyderabad</span>
+          <span style={{marginLeft:"auto"}}>🏠 Destination: Your address</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// PAYMENT MODAL
+// ══════════════════════════════════════════════════════
+function PaymentModal({cart, cartTotal, onConfirm, onClose, t}) {
+  const [method, setMethod]   = useState("upi");
+  const [upiId, setUpiId]     = useState("");
+  const [upiOk, setUpiOk]     = useState(false);
+  const [cardNum, setCardNum] = useState("");
+  const [cardExp, setCardExp] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+  const [cardName,setCardName]= useState("");
+  const [paying, setPaying]   = useState(false);
+  const [done, setDone]       = useState(false);
+
+  const paymentMethods = [
+    {id:"upi",  icon:"📱", label:t.upi},
+    {id:"card", icon:"💳", label:t.card},
+    {id:"cod",  icon:"💵", label:t.cod},
+    {id:"nb",   icon:"🏦", label:t.netbanking},
+  ];
+
+  const handlePay = () => {
+    setPaying(true);
+    setTimeout(()=>{
+      setDone(true);
+      setTimeout(()=>onConfirm(method), 900);
+    }, 1800);
+  };
+
+  const canPay = () => {
+    if(method==="upi")  return upiOk || upiId.includes("@");
+    if(method==="card") return cardNum.length>=12 && cardExp.length>=4 && cardCvv.length>=3 && cardName.length>2;
+    return true;
+  };
+
+  const banks = ["State Bank of India","HDFC Bank","ICICI Bank","Axis Bank","Kotak Bank","Punjab National Bank"];
+
+  return (
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal payment-modal">
+        <h3 className="modal-title">💳 {t.paymentMethod}</h3>
+
+        {/* Order summary */}
+        <div className="pay-summary">
+          {cart.map(item=>(
+            <div key={item.id} className="pay-summary-row">
+              <span>{item.emoji} {item.name} ×{item.qty}</span>
+              <span>₹{item.price*item.qty}</span>
+            </div>
+          ))}
+          <div className="pay-summary-row pay-summary-total">
+            <span>{t.orderTotal}</span>
+            <span>₹{cartTotal}</span>
+          </div>
+        </div>
+
+        <p style={{fontSize:".82rem",color:"var(--text-muted)",marginBottom:".75rem"}}>{t.selectPayment}</p>
+
+        {/* Payment method selector */}
+        <div className="payment-options" style={{marginBottom:"1rem"}}>
+          {paymentMethods.map(m=>(
+            <div key={m.id} className={`payment-opt ${method===m.id?"selected":""}`} onClick={()=>setMethod(m.id)}>
+              <span className="payment-icon">{m.icon}</span>
+              <span>{m.label}</span>
+              {method===m.id && <span style={{marginLeft:"auto",color:"var(--green-500)"}}>✓</span>}
+            </div>
+          ))}
+        </div>
+
+        {/* UPI details */}
+        {method==="upi" && (
+          <div className="payment-details">
+            <div style={{fontWeight:600,marginBottom:".3rem"}}>Enter UPI ID</div>
+            <div className="upi-input">
+              <input value={upiId} onChange={e=>setUpiId(e.target.value)} placeholder="yourname@upi" style={{border:"1.5px solid var(--border)",borderRadius:8,padding:".5rem .75rem",fontSize:".9rem"}} />
+              <button className="upi-verify-btn" onClick={()=>setUpiOk(true)}>Verify</button>
+            </div>
+            {upiOk && <div style={{color:"var(--green-700)",fontSize:".8rem",marginTop:".4rem",fontWeight:600}}>✅ UPI ID verified!</div>}
+            <div style={{marginTop:".6rem",fontSize:".75rem",color:"var(--text-muted)"}}>
+              Supported: <strong>PhonePe • GPay • Paytm • BHIM • Amazon Pay</strong>
+            </div>
+          </div>
+        )}
+
+        {/* Card details */}
+        {method==="card" && (
+          <div className="payment-details">
+            <div style={{fontWeight:600,marginBottom:".5rem"}}>Card Details</div>
+            <div className="card-grid">
+              <div className="card-row">
+                <input value={cardName} onChange={e=>setCardName(e.target.value)} placeholder="Cardholder Name" style={{width:"100%",padding:".5rem .75rem",border:"1.5px solid var(--border)",borderRadius:8,fontSize:".85rem",fontFamily:"inherit",marginBottom:".4rem"}}/>
+              </div>
+              <div className="card-row">
+                <input value={cardNum} onChange={e=>setCardNum(e.target.value.replace(/\D/g,"").slice(0,16))} placeholder="Card Number (16 digits)" style={{width:"100%",padding:".5rem .75rem",border:"1.5px solid var(--border)",borderRadius:8,fontSize:".85rem",fontFamily:"inherit",marginBottom:".4rem"}} />
+              </div>
+              <input value={cardExp} onChange={e=>setCardExp(e.target.value)} placeholder="MM/YY" style={{padding:".5rem .75rem",border:"1.5px solid var(--border)",borderRadius:8,fontSize:".85rem",fontFamily:"inherit"}} />
+              <input value={cardCvv} onChange={e=>setCardCvv(e.target.value.slice(0,3))} placeholder="CVV" type="password" style={{padding:".5rem .75rem",border:"1.5px solid var(--border)",borderRadius:8,fontSize:".85rem",fontFamily:"inherit"}} />
+            </div>
+            <div style={{fontSize:".72rem",color:"var(--text-muted)",marginTop:".5rem"}}>🔒 256-bit SSL encrypted · Visa · Mastercard · RuPay</div>
+          </div>
+        )}
+
+        {/* COD details */}
+        {method==="cod" && (
+          <div className="payment-details">
+            <div style={{fontWeight:600,marginBottom:".3rem"}}>Cash on Delivery</div>
+            <p style={{fontSize:".82rem"}}>Pay ₹{cartTotal} when your order arrives at your doorstep. Keep exact change ready.</p>
+            <div style={{marginTop:".5rem",padding:".4rem .6rem",background:"#fff3e0",borderRadius:6,fontSize:".75rem",color:"#e65100"}}>
+              ⚠️ COD available for orders up to ₹2000 only.
+            </div>
+          </div>
+        )}
+
+        {/* Net banking */}
+        {method==="nb" && (
+          <div className="payment-details">
+            <div style={{fontWeight:600,marginBottom:".5rem"}}>Select Your Bank</div>
+            <select style={{width:"100%",padding:".6rem .75rem",border:"1.5px solid var(--border)",borderRadius:8,fontSize:".88rem",fontFamily:"inherit",background:"#fff"}}>
+              <option value="">Choose a bank...</option>
+              {banks.map(b=><option key={b}>{b}</option>)}
+            </select>
+          </div>
+        )}
+
+        <button className={`pay-btn ${done?"success":""}`} onClick={handlePay} disabled={!canPay()||paying}>
+          {done ? "✅ Payment Successful! Placing Order..." : paying ? "⏳ Processing Payment..." : `Pay ₹${cartTotal} →`}
+        </button>
+        <button onClick={onClose} style={{width:"100%",padding:".6rem",background:"none",border:"none",color:"var(--text-muted)",cursor:"pointer",fontSize:".85rem",marginTop:".4rem"}}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// 4. ROOT APP
+// ══════════════════════════════════════════════════════
+function App() {
+  const [users,    setUsersRaw]    = useState(() => LS.get("km_users",    SEED_USERS));
+  const [products, setProductsRaw] = useState(() => LS.get("km_products", SEED_PRODUCTS));
+  const [orders,   setOrdersRaw]   = useState(() => LS.get("km_orders",   SEED_ORDERS));
+  const [currentUser, setCU]       = useState(() => LS.get("km_session",null));
+  const [page,   setPage]   = useState("home");
+  const [cart,   setCartRaw] = useState(() => LS.get("km_cart_"+(LS.get("km_session",null)?.id||"guest"), []));
+  const [cartOpen,  setCartOpen]   = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [toast, setToast]   = useState(null);
+  const [lang,  setLang]    = useState(() => LS.get("km_lang","en"));
+  const toastTimer = useRef(null);
+
+  const t = LANGUAGES[lang] || LANGUAGES.en;
+
+  const setUsers    = v => { const d=typeof v==="function"?v(users):v;    setUsersRaw(d);    LS.set("km_users",d); };
+  const setProducts = v => { const d=typeof v==="function"?v(products):v; setProductsRaw(d); LS.set("km_products",d); };
+  const setOrders   = v => { const d=typeof v==="function"?v(orders):v;   setOrdersRaw(d);   LS.set("km_orders",d); };
+  const setCart     = v => {
+    const uid = currentUser?.id||"guest";
+    const d   = typeof v==="function"?v(cart):v;
+    setCartRaw(d); LS.set("km_cart_"+uid, d);
+  };
+
+  const notify = (msg, icon="✅") => {
+    clearTimeout(toastTimer.current);
+    setToast({msg,icon});
+    toastTimer.current = setTimeout(()=>setToast(null), 3000);
+  };
+
+  const login = (user) => {
+    setCU(user);
+    LS.set("km_session", user);
+    const savedCart = LS.get("km_cart_"+user.id, []);
+    setCartRaw(savedCart);
+    setPage(user.role==="admin" ? "admin" : user.role==="farmer" ? "farmer" : "shop");
+    notify(`Welcome back, ${user.name.split(" ")[0]}! 👋`, "🌿");
+  };
+
+  const logout = () => {
+    if (currentUser) LS.set("km_cart_"+currentUser.id, cart);
+    setCU(null); LS.set("km_session",null);
+    setCartRaw([]); setPage("home");
+    notify("Logged out successfully","👋");
+  };
+
+  const addToCart = (product) => {
+    if (!currentUser || currentUser.role !== "consumer") {
+      setPage("auth");
+      notify("Please login as Consumer first!", "⚠️");
+      return;
+    }
+    setCart(c => {
+      const ex = c.find(i=>i.id===product.id);
+      if (ex) return c.map(i=>i.id===product.id?{...i,qty:i.qty+1}:i);
+      return [...c, {...product, qty:1}];
+    });
+    notify(`${product.emoji} ${product.name} added to cart!`, "🛒");
+  };
+
+  const updateQty  = (id,delta) => setCart(c=>c.map(i=>i.id===id?{...i,qty:Math.max(1,i.qty+delta)}:i));
+  const removeItem = (id)       => { setCart(c=>c.filter(i=>i.id!==id)); notify("Item removed","🗑"); };
+  const cartTotal  = cart.reduce((s,i)=>s+i.price*i.qty, 0);
+  const cartCount  = cart.reduce((s,i)=>s+i.qty, 0);
+
+  const initiateCheckout = () => {
+    if (!currentUser) { setPage("auth"); setCartOpen(false); return; }
+    if (cart.length===0) return;
+    setCartOpen(false);
+    setShowPayment(true);
+  };
+
+  const placeOrder = (paymentMethod) => {
+    const order = {
+      id: genOrdId(orders),
+      consumerId: currentUser.id,
+      consumerName: currentUser.name,
+      items: cart.map(i=>({productId:i.id,name:i.name,emoji:i.emoji,qty:i.qty,price:i.price})),
+      total: cartTotal,
+      status: paymentMethod==="cod" ? "Processing" : "Processing",
+      date: new Date().toISOString().slice(0,10),
+      farmerId: cart[0].farmerId,
+      paymentMethod: paymentMethod==="upi"?"UPI":paymentMethod==="card"?"Card":paymentMethod==="cod"?"Cash on Delivery":"Net Banking",
+      paymentStatus: paymentMethod==="cod"?"Pending":"Paid",
+    };
+    setOrders(o=>[...o,order]);
+    setProducts(p=>p.map(pr=>{const ci=cart.find(c=>c.id===pr.id);return ci?{...pr,stock:pr.stock-ci.qty}:pr;}));
+    setCart([]);
+    setShowPayment(false);
+    notify("Order placed successfully! 🎉","✅");
+    setPage("orders");
+  };
+
+  return (
+    <div>
+      <Navbar currentUser={currentUser} setPage={setPage} cartCount={cartCount} setCartOpen={setCartOpen} logout={logout} t={t} lang={lang} setLang={setLang} />
+      <CartSidebar open={cartOpen} setOpen={setCartOpen} cart={cart} updateQty={updateQty} removeItem={removeItem} cartTotal={cartTotal} initiateCheckout={initiateCheckout} currentUser={currentUser} setPage={setPage} t={t} />
+      {showPayment && <PaymentModal cart={cart} cartTotal={cartTotal} onConfirm={placeOrder} onClose={()=>setShowPayment(false)} t={t} />}
+      {toast && <Toast msg={toast.msg} icon={toast.icon} />}
+      {page==="home"    && <HomePage    setPage={setPage} currentUser={currentUser} products={products} addToCart={addToCart} t={t} />}
+      {page==="auth"    && <AuthPage    users={users} setUsers={setUsers} login={login} setPage={setPage} />}
+      {page==="shop"    && <ShopPage    products={products} addToCart={addToCart} currentUser={currentUser} setPage={setPage} cart={cart} t={t} />}
+      {page==="orders"  && <OrdersPage  orders={orders} currentUser={currentUser} setPage={setPage} t={t} />}
+      {page==="farmer"  && <FarmerDash  currentUser={currentUser} products={products} setProducts={setProducts} orders={orders} users={users} notify={notify} t={t} />}
+      {page==="admin"   && <AdminDash   users={users} setUsers={setUsers} products={products} setProducts={setProducts} orders={orders} setOrders={setOrders} notify={notify} />}
+      {page==="profile" && <ProfilePage currentUser={currentUser} logout={logout} setPage={setPage} orders={orders} />}
+    </div>
+  );
+}
+
+function Toast({msg,icon}) {
+  return <div className="toast"><span className="toast-icon">{icon}</span><span>{msg}</span></div>;
+}
+
+// ══════════════════════════════════════════════════════
+// NAVBAR — with language selector
+// ══════════════════════════════════════════════════════
+function Navbar({currentUser,setPage,cartCount,setCartOpen,logout,t,lang,setLang}) {
+  return (
+    <nav className="navbar">
+      <div className="logo" onClick={()=>setPage("home")}>Kisan<span>Mart</span></div>
+      <div className="nav-right">
+        <LangSelector lang={lang} setLang={setLang} />
+        {currentUser ? (
+          <>
+            {currentUser.role==="consumer" && <>
+              <button className="nav-btn" onClick={()=>setPage("shop")}>🛍 {t.shop}</button>
+              <button className="nav-btn" onClick={()=>setPage("orders")}>📦 {t.orders}</button>
+              <button className="cart-btn" onClick={()=>setCartOpen(true)}>
+                🛒 <span className="cart-count">{cartCount>0?cartCount:""}</span>
+                {cartCount>0&&<span className="cart-badge">{cartCount}</span>}
+              </button>
+            </>}
+            {currentUser.role==="farmer" && <button className="nav-btn" onClick={()=>setPage("farmer")}>🌾 {t.dashboard}</button>}
+            {currentUser.role==="admin"  && <button className="nav-btn" onClick={()=>setPage("admin")}>⚙️ {t.admin}</button>}
+            <div className="profile-chip" onClick={()=>setPage("profile")}>
+              <div className="avatar">{currentUser.name[0]}</div>
+              <span>{currentUser.name.split(" ")[0]}</span>
+            </div>
+            <button className="nav-btn" onClick={logout}>{t.logout}</button>
+          </>
+        ) : (
+          <>
+            <button className="nav-btn" onClick={()=>setPage("shop")}>🛍 {t.shop}</button>
+            <button className="nav-btn" onClick={()=>setPage("auth")}>{t.signIn}</button>
+            <button className="nav-btn primary" onClick={()=>setPage("auth")}>{t.register}</button>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// HOME PAGE
+// ══════════════════════════════════════════════════════
+function HomePage({setPage,currentUser,products,addToCart,t}) {
+  return (
+    <div>
+      <div className="hero">
+        <h1>{t.heroTitle}<br/><span>{t.heroSpan}</span></h1>
+        <p>{t.heroDesc}</p>
+        <div className="hero-btns">
+          <button className="hero-btn primary" onClick={()=>setPage("shop")}>{t.shopNow}</button>
+          {!currentUser&&<button className="hero-btn outline" onClick={()=>setPage("auth")}>{t.joinFarmer}</button>}
+        </div>
+        <div className="stats">
+          <div className="stat"><div className="stat-num">200+</div><div className="stat-label">{t.verifiedFarmers}</div></div>
+          <div className="stat"><div className="stat-num">500+</div><div className="stat-label">{t.products}</div></div>
+          <div className="stat"><div className="stat-num">5000+</div><div className="stat-label">{t.happyConsumers}</div></div>
+          <div className="stat"><div className="stat-num">0</div><div className="stat-label">{t.middlemen}</div></div>
+        </div>
+      </div>
+      <div className="container section">
+        <div className="flex-between" style={{marginBottom:"2rem"}}>
+          <div>
+            <h2 style={{fontSize:"2rem",fontFamily:"Playfair Display,serif"}}>{t.featuredProducts}</h2>
+            <p style={{color:"var(--text-muted)"}}>{t.freshPicks}</p>
+          </div>
+          <button className="nav-btn" style={{border:"1.5px solid var(--green-700)",color:"var(--green-700)",background:"none"}} onClick={()=>setPage("shop")}>{t.viewAll}</button>
+        </div>
+        <div className="product-grid">
+          {products.slice(0,6).map(p=><ProductCard key={p.id} product={p} addToCart={addToCart} currentUser={currentUser} cart={[]} t={t} />)}
+        </div>
+      </div>
+      <div style={{background:"var(--green-900)",padding:"3rem 2rem",color:"#fff",textAlign:"center"}}>
+        <h2 style={{fontSize:"2rem",marginBottom:".75rem",fontFamily:"Playfair Display,serif"}}>{t.areYouFarmer}</h2>
+        <p style={{opacity:.7,marginBottom:"1.5rem"}}>{t.farmerDesc}</p>
+        <button className="hero-btn primary" onClick={()=>setPage("auth")}>{t.registerFarmer}</button>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// PRODUCT CARD
+// ══════════════════════════════════════════════════════
+function ProductCard({product,addToCart,currentUser,cart,setPage,t}) {
+  const inCart = cart && cart.find(i=>i.id===product.id);
+  const canBuy = currentUser && currentUser.role==="consumer";
+  return (
+    <div className="product-card">
+      <div className="product-img">{product.emoji}</div>
+      <div className="product-body">
+        {product.organic&&<div className="badge-organic">{t?t.organic:"🌿 Organic"}</div>}
+        <div className="product-name">{product.name}</div>
+        <div className="product-farmer">🧑‍🌾 {product.farmerName}</div>
+        <div className="product-meta">
+          <div>
+            <div className="product-price">₹{product.price}/{product.unit}</div>
+            <div className="product-stock">{product.stock>0?`${product.stock} ${product.unit} ${t?t.available:"available"}`:t?t.outOfStock:"Out of stock"}</div>
+          </div>
+          {product.stock===0 ? (
+            <button className="add-btn" disabled>{t?t.soldOut:"Sold Out"}</button>
+          ) : inCart ? (
+            <div className="in-cart-btn">✓ {t?t.inCart:"In Cart"} ({inCart.qty})</div>
+          ) : (
+            <button className="add-btn" onClick={()=>addToCart(product)}>
+              {canBuy ? (t?t.addToCart:"Add 🛒") : (t?t.buy:"Buy")}
+            </button>
+          )}
+        </div>
+        {inCart && product.stock>0 && (
+          <button className="add-btn" style={{width:"100%",marginTop:".5rem"}} onClick={()=>addToCart(product)}>
+            {t?t.addMore:"+ Add More"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// AUTH PAGE
+// ══════════════════════════════════════════════════════
+function AuthPage({users,setUsers,login,setPage}) {
+  const [mode,  setMode]  = useState("login");
+  const [role,  setRole]  = useState("consumer");
+  const [form,  setForm]  = useState({name:"",email:"",password:"",location:""});
+  const [error, setError] = useState("");
+  const [ok,    setOk]    = useState("");
+
+  const handleLogin = () => {
+    setError("");
+    const user = users.find(u=>u.email.toLowerCase()===form.email.toLowerCase() && u.password===form.password);
+    if (!user) { setError("Invalid email or password."); return; }
+    login(user);
+  };
+
+  const handleRegister = () => {
+    setError("");
+    if (!form.name||!form.email||!form.password) { setError("All fields are required."); return; }
+    if (form.password.length<6) { setError("Password must be at least 6 characters."); return; }
+    if (users.find(u=>u.email.toLowerCase()===form.email.toLowerCase())) { setError("Email already registered."); return; }
+    const newUser = {
+      id: genId(users), name: form.name.trim(), email: form.email.toLowerCase().trim(),
+      password: form.password, role, verified: role!=="farmer",
+      location: form.location, joinDate: new Date().toISOString().slice(0,10)
+    };
+    setUsers([...users, newUser]);
+    setOk(`Account created! ${role==="farmer"?"Awaiting admin verification.":""}`);
+    setTimeout(()=>login(newUser), 800);
+  };
+
+  const demoLogin = (email,password) => {
+    const user = users.find(u=>u.email===email&&u.password===password);
+    if (user) login(user);
+  };
+
+  return (
+    <div style={{background:"var(--green-100)",minHeight:"calc(100vh - 64px)",paddingBottom:"3rem"}}>
+      <div className="form-card">
+        <h2 className="form-title">{mode==="login"?"Welcome Back 👋":"Join KisanMart 🌿"}</h2>
+        <p className="form-sub">{mode==="login"?"Sign in to your account":"Create your free account"}</p>
+        {mode==="register"&&(
+          <div className="role-select">
+            {[["consumer","🛒","Consumer"],["farmer","🌾","Farmer"]].map(([r,icon,label])=>(
+              <div key={r} className={`role-opt ${role===r?"active":""}`} onClick={()=>setRole(r)}>
+                <span className="role-icon">{icon}</span>{label}
+              </div>
+            ))}
+          </div>
+        )}
+        {error&&<div className="alert alert-error">⚠️ {error}</div>}
+        {ok   &&<div className="alert alert-success">✅ {ok}</div>}
+        {mode==="register"&&(<div className="form-group"><label>Full Name *</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Your full name" /></div>)}
+        <div className="form-group"><label>Email Address *</label><input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="you@example.com" /></div>
+        <div className="form-group"><label>Password *</label><input type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} placeholder="Min. 6 characters" /></div>
+        {mode==="register"&&role==="farmer"&&(<div className="form-group"><label>Farm Location</label><input value={form.location} onChange={e=>setForm({...form,location:e.target.value})} placeholder="City, State" /></div>)}
+        <button className="btn btn-primary" onClick={mode==="login"?handleLogin:handleRegister}>
+          {mode==="login"?"Sign In →":"Create Account & Start Shopping →"}
+        </button>
+        {mode==="register"&&role==="consumer"&&(<p style={{fontSize:".8rem",color:"var(--green-700)",marginTop:".5rem",textAlign:"center",fontWeight:600}}>✅ Consumer accounts are instantly active!</p>)}
+        {mode==="register"&&role==="farmer"&&(<p style={{fontSize:".8rem",color:"var(--amber-500)",marginTop:".5rem",textAlign:"center"}}>⚠️ Farmer accounts need admin verification.</p>)}
+        <div style={{marginTop:"1.5rem",border:"1px solid var(--border)",borderRadius:10,padding:"1rem"}}>
+          <p style={{fontSize:".78rem",color:"var(--text-muted)",marginBottom:".75rem",fontWeight:600}}>⚡ Quick Demo Login:</p>
+          <div style={{display:"flex",gap:".5rem",flexWrap:"wrap"}}>
+            {[["admin@kisanmart.com","admin123","🛠 Admin"],["ramu@farm.com","farmer123","🌾 Farmer"],["priya@gmail.com","consumer123","🛒 Consumer"]].map(([e,p,l])=>(
+              <button key={l} onClick={()=>demoLogin(e,p)} style={{padding:".3rem .75rem",border:"1.5px solid var(--green-300)",borderRadius:6,background:"none",cursor:"pointer",fontSize:".8rem",color:"var(--green-700)",fontWeight:600}}>{l}</button>
+            ))}
+          </div>
+        </div>
+        <div className="toggle-link">
+          {mode==="login"?<>Don't have an account? <span onClick={()=>{setMode("register");setError("");setOk("");}}>Register here</span></>
+            :<>Already have an account? <span onClick={()=>{setMode("login");setError("");setOk("");}}>Sign in</span></>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// SHOP PAGE
+// ══════════════════════════════════════════════════════
+function ShopPage({products,addToCart,currentUser,setPage,cart,t}) {
+  const [search,   setSearch]   = useState("");
+  const [category, setCategory] = useState("All");
+  const [sort,     setSort]     = useState("default");
+
+  let filtered = products.filter(p=>
+    (category==="All"||p.category===category)&&
+    (p.name.toLowerCase().includes(search.toLowerCase())||p.farmerName.toLowerCase().includes(search.toLowerCase()))
+  );
+  if (sort==="price-asc")  filtered=[...filtered].sort((a,b)=>a.price-b.price);
+  if (sort==="price-desc") filtered=[...filtered].sort((a,b)=>b.price-a.price);
+  if (sort==="name")       filtered=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1>Fresh Vegetables & Fruits 🥕</h1>
+        <p>Sourced directly from {[...new Set(products.map(p=>p.farmerName))].length} verified farmers</p>
+      </div>
+      <div className="container section">
+        {!currentUser&&(<div className="login-prompt">🛒 <strong onClick={()=>setPage("auth")}>Sign in or Register</strong> to add products to cart!</div>)}
+        {currentUser&&currentUser.role!=="consumer"&&(<div className="login-prompt">ℹ️ Only Consumer accounts can buy products.</div>)}
+        {currentUser&&currentUser.role==="consumer"&&(<div className="persist-note">💾 Your cart is auto-saved. Secure payments via UPI, Card, COD & more!</div>)}
+        <div className="search-bar">
+          <input className="search-input" placeholder="🔍 Search products or farmer names..." value={search} onChange={e=>setSearch(e.target.value)} />
+          <select className="filter-select" value={category} onChange={e=>setCategory(e.target.value)}>
+            {CATEGORIES.map(c=><option key={c}>{c}</option>)}
+          </select>
+          <select className="filter-select" value={sort} onChange={e=>setSort(e.target.value)}>
+            <option value="default">Default</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+        {filtered.length===0?(
+          <div className="empty-state"><div className="empty-state-icon">🥕</div><p>No products found.</p></div>
+        ):(
+          <div className="product-grid">
+            {filtered.map(p=><ProductCard key={p.id} product={p} addToCart={addToCart} currentUser={currentUser} cart={cart} setPage={setPage} t={t} />)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// ORDERS PAGE — with Live Tracking
+// ══════════════════════════════════════════════════════
+function OrdersPage({orders,currentUser,setPage,t}) {
+  const myOrders = currentUser ? orders.filter(o=>o.consumerId===currentUser.id) : [];
+  const steps    = ["Processing","Dispatched","Out for Delivery","Delivered"];
+
+  return (
+    <div>
+      <div className="page-header"><h1>{t.myOrders}</h1><p>{t.trackFarmToDoor}</p></div>
+      <div className="container section">
+        <div className="persist-note">💾 All your orders are saved. Tap any active order to see live location!</div>
+        {myOrders.length===0?(
+          <div className="empty-state">
+            <div className="empty-state-icon">📦</div>
+            <h3>No orders yet</h3>
+            <p>Start shopping to place your first order!</p>
+            <button className="btn btn-primary" style={{width:"auto",marginTop:"1rem",padding:".75rem 2rem"}} onClick={()=>setPage("shop")}>Shop Now</button>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:"1.5rem"}}>
+            {myOrders.slice().reverse().map(order=>{
+              const stepIdx=steps.indexOf(order.status);
+              const showMap = order.status==="Out for Delivery"||order.status==="Dispatched"||order.status==="Delivered";
+              return(
+                <div key={order.id} className="dash-card" style={{padding:"1.5rem"}}>
+                  <div className="flex-between" style={{marginBottom:"1rem"}}>
+                    <div>
+                      <span style={{fontWeight:700}}>{order.id}</span>
+                      <span style={{color:"var(--text-muted)",marginLeft:".75rem",fontSize:".85rem"}}>📅 {order.date}</span>
+                    </div>
+                    <div style={{display:"flex",gap:".5rem",alignItems:"center"}}>
+                      {order.paymentMethod && (
+                        <span style={{fontSize:".75rem",background:"#e3f2fd",color:"#1565c0",padding:".2rem .5rem",borderRadius:6,fontWeight:600}}>
+                          {order.paymentMethod==="UPI"?"📱":order.paymentMethod==="Card"?"💳":order.paymentMethod==="Net Banking"?"🏦":"💵"} {order.paymentMethod}
+                        </span>
+                      )}
+                      {order.paymentStatus && (
+                        <span className={`status-badge ${order.paymentStatus==="Paid"?"status-paid":"status-pending"}`}>
+                          {order.paymentStatus==="Paid"?"✓ Paid":"⏳ COD"}
+                        </span>
+                      )}
+                      <span className={`status-badge status-${order.status.toLowerCase().replace(/ /g,"-")}`}>{order.status}</span>
+                    </div>
+                  </div>
+
+                  <div style={{marginBottom:"1rem"}}>
+                    {order.items.map((item,i)=>(
+                      <div key={i} style={{display:"flex",gap:".5rem",alignItems:"center",marginBottom:".25rem"}}>
+                        <span>{item.emoji}</span><span>{item.name}</span>
+                        <span style={{color:"var(--text-muted)"}}>x{item.qty}</span>
+                        <span style={{marginLeft:"auto",fontWeight:600}}>₹{item.price*item.qty}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{fontWeight:700,fontSize:"1.1rem",color:"var(--green-700)",marginBottom:"1rem"}}>Total: ₹{order.total}</div>
+
+                  {/* Live tracking map */}
+                  {showMap && <LiveTrackingMap order={order} t={t} />}
+
+                  <div className="tracking-steps" style={{marginTop:"1rem"}}>
+                    {steps.map((s,i)=>(
+                      <div key={s} className="track-step">
+                        <div className={`track-dot ${i<stepIdx?"done":i===stepIdx?"active":""}`}>
+                          {i<stepIdx?"✓":i===stepIdx?"●":"○"}
+                        </div>
+                        <div className={`track-label ${i<=stepIdx?"done":""}`}>{s}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// CART SIDEBAR — checkout triggers payment modal
+// ══════════════════════════════════════════════════════
+function CartSidebar({open,setOpen,cart,updateQty,removeItem,cartTotal,initiateCheckout,currentUser,setPage,t}) {
+  return (
+    <>
+      <div className={`cart-overlay ${open?"open":""}`} onClick={()=>setOpen(false)} />
+      <div className={`cart-sidebar ${open?"open":""}`}>
+        <div className="cart-header">
+          <h3>🛒 Cart {cart.length>0&&`(${cart.length})`}</h3>
+          <button className="cart-close" onClick={()=>setOpen(false)}>✕</button>
+        </div>
+        <div className="cart-items">
+          {cart.length===0?(
+            <div className="empty-state">
+              <div className="empty-state-icon">🛒</div>
+              <p>Your cart is empty</p>
+              <button className="add-btn" style={{marginTop:"1rem"}} onClick={()=>{setOpen(false);setPage("shop");}}>Browse Products</button>
+            </div>
+          ):(
+            cart.map(item=>(
+              <div key={item.id} className="cart-item">
+                <div className="cart-item-emoji">{item.emoji}</div>
+                <div className="cart-item-info">
+                  <div className="cart-item-name">{item.name}</div>
+                  <div className="cart-item-farmer">🧑‍🌾 {item.farmerName}</div>
+                  <div className="cart-item-price">₹{item.price*item.qty}</div>
+                  <div className="qty-ctrl">
+                    <button className="qty-btn" onClick={()=>updateQty(item.id,-1)}>−</button>
+                    <span className="qty-val">{item.qty}</span>
+                    <button className="qty-btn" onClick={()=>updateQty(item.id,+1)}>+</button>
+                    <span style={{color:"var(--text-muted)",fontSize:".8rem"}}>@ ₹{item.price}/{item.unit}</span>
+                  </div>
+                </div>
+                <button className="remove-btn" onClick={()=>removeItem(item.id)}>🗑</button>
+              </div>
+            ))
+          )}
+        </div>
+        {cart.length>0&&(
+          <div className="cart-footer">
+            <div className="cart-total"><span>{t?t.orderTotal:"Order Total"}</span><span>₹{cartTotal}</span></div>
+            {/* Payment method preview chips */}
+            <div style={{display:"flex",gap:".4rem",flexWrap:"wrap",marginBottom:".75rem"}}>
+              {["📱 UPI","💳 Card","💵 COD","🏦 Net Banking"].map(m=>(
+                <span key={m} style={{fontSize:".72rem",background:"var(--green-100)",color:"var(--green-700)",padding:".2rem .5rem",borderRadius:6,fontWeight:600}}>{m}</span>
+              ))}
+            </div>
+            <button className="checkout-btn" onClick={initiateCheckout}>
+              {t?t.placeOrder:"Place Order"} — ₹{cartTotal} 🔒
+            </button>
+            <p style={{textAlign:"center",fontSize:".75rem",color:"var(--text-muted)",marginTop:".5rem"}}>🔒 Secure checkout · Multiple payment options</p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// FARMER DASHBOARD
+// ══════════════════════════════════════════════════════
+function FarmerDash({currentUser,products,setProducts,orders,users,notify,t}) {
+  const [tab,       setTab]       = useState("products");
+  const [showModal, setShowModal] = useState(false);
+  const [editProd,  setEditProd]  = useState(null);
+  const [form,      setForm]      = useState({name:"",emoji:"🥬",price:"",unit:"kg",stock:"",category:"Vegetables",description:"",organic:false});
+
+  const isVerified = users.find(u=>u.id===currentUser?.id)?.verified;
+  const myProducts = products.filter(p=>p.farmerId===currentUser?.id);
+  const myOrders   = orders.filter(o=>o.farmerId===currentUser?.id);
+  const revenue    = myOrders.filter(o=>o.status==="Delivered").reduce((s,o)=>s+o.total,0);
+
+  const openAdd  = () => { setEditProd(null); setForm({name:"",emoji:"🥬",price:"",unit:"kg",stock:"",category:"Vegetables",description:"",organic:false}); setShowModal(true); };
+  const openEdit = p  => { setEditProd(p); setForm({name:p.name,emoji:p.emoji,price:p.price,unit:p.unit,stock:p.stock,category:p.category,description:p.description,organic:p.organic}); setShowModal(true); };
+  const saveProd = () => {
+    if (!form.name||!form.price||!form.stock) { alert("Fill all required fields"); return; }
+    if (editProd) { setProducts(ps=>ps.map(p=>p.id===editProd.id?{...p,...form,price:+form.price,stock:+form.stock}:p)); notify("Product updated!","✏️"); }
+    else { setProducts(ps=>[...ps,{id:genId(ps),...form,price:+form.price,stock:+form.stock,farmerId:currentUser.id,farmerName:currentUser.name}]); notify("Product added!","✅"); }
+    setShowModal(false);
+  };
+  const delProd = id => { if (confirm("Delete this product?")) { setProducts(ps=>ps.filter(p=>p.id!==id)); notify("Product deleted","🗑"); } };
+  const EMOJIS  = ["🍅","🥬","🥔","🧅","🥕","🥦","🥭","🍆","🌽","🫑","🧄","🥒","🍋","🍓","🍇","🌿","🍌","🧲"];
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="flex-between">
+          <div><h1>Farmer Dashboard 🌾</h1><p>Welcome, {currentUser?.name}!</p></div>
+          {isVerified ? <span className="status-badge status-verified" style={{fontSize:".9rem",padding:".4rem 1rem"}}>✓ Verified Farmer</span>
+            : <span className="status-badge status-unverified" style={{fontSize:".9rem",padding:".4rem 1rem"}}>⏳ Pending Verification</span>}
+        </div>
+      </div>
+      {!isVerified&&<div className="alert alert-error" style={{margin:"1rem 2rem"}}>⚠️ Your account is pending admin verification.</div>}
+      <div className="container section">
+        <div className="dash-grid">
+          <div className="dash-card"><div className="dash-card-icon">📦</div><div className="dash-card-val">{myProducts.length}</div><div className="dash-card-label">Products Listed</div></div>
+          <div className="dash-card"><div className="dash-card-icon">🛒</div><div className="dash-card-val">{myOrders.length}</div><div className="dash-card-label">Total Orders</div></div>
+          <div className="dash-card"><div className="dash-card-icon">✅</div><div className="dash-card-val">{myOrders.filter(o=>o.status==="Delivered").length}</div><div className="dash-card-label">Delivered</div></div>
+          <div className="dash-card"><div className="dash-card-icon">💰</div><div className="dash-card-val">₹{revenue}</div><div className="dash-card-label">Revenue Earned</div></div>
+        </div>
+        <div className="tabs">
+          {[["products","My Products"],["orders","Orders Received"]].map(([k,v])=>(
+            <button key={k} className={`tab ${tab===k?"active":""}`} onClick={()=>setTab(k)}>{v}</button>
+          ))}
+        </div>
+        {tab==="products"&&(
+          <>
+            <div className="flex-between" style={{marginBottom:"1.5rem"}}>
+              <h3>My Products ({myProducts.length})</h3>
+              <button className="btn-sm btn-sm-primary" style={{padding:".6rem 1.2rem",fontSize:".9rem"}} onClick={openAdd}>+ Add Product</button>
+            </div>
+            {myProducts.length===0?(<div className="empty-state"><div className="empty-state-icon">🌾</div><p>No products yet.</p></div>):(
+              <div className="table-wrap">
+                <table className="data-table">
+                  <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    {myProducts.map(p=>(
+                      <tr key={p.id}>
+                        <td><span style={{fontSize:"1.3rem",marginRight:".5rem"}}>{p.emoji}</span><strong>{p.name}</strong>{p.organic&&<span className="tag" style={{marginLeft:".5rem"}}>Organic</span>}</td>
+                        <td><span className="tag">{p.category}</span></td>
+                        <td>₹{p.price}/{p.unit}</td>
+                        <td style={{color:p.stock<10?"var(--red-500)":"inherit",fontWeight:p.stock<10?700:400}}>{p.stock} {p.unit}{p.stock<10&&" ⚠️"}</td>
+                        <td><div className="action-bar"><button className="btn-sm btn-sm-warning" onClick={()=>openEdit(p)}>Edit</button><button className="btn-sm btn-sm-danger" onClick={()=>delProd(p.id)}>Delete</button></div></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+        {tab==="orders"&&(
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead><tr><th>Order ID</th><th>Consumer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+              <tbody>
+                {myOrders.length===0?<tr><td colSpan={6} style={{textAlign:"center",color:"var(--text-muted)",padding:"2rem"}}>No orders yet</td></tr>
+                  :myOrders.map(o=>(
+                    <tr key={o.id}>
+                      <td><strong>{o.id}</strong></td>
+                      <td>{o.consumerName}</td>
+                      <td>{o.items.map(i=>`${i.emoji}${i.name}×${i.qty}`).join(", ")}</td>
+                      <td>₹{o.total}</td>
+                      <td><span style={{fontSize:".8rem"}}>{o.paymentMethod||"—"}</span></td>
+                      <td><span className={`status-badge status-${o.status.toLowerCase().replace(/ /g,"-")}`}>{o.status}</span></td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      {showModal&&(
+        <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&setShowModal(false)}>
+          <div className="modal">
+            <h3 className="modal-title">{editProd?"Edit Product ✏️":"Add New Product +"}</h3>
+            <div className="form-group"><label>Product Name *</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="e.g., Fresh Tomatoes" /></div>
+            <div className="form-group">
+              <label>Emoji Icon</label>
+              <div style={{display:"flex",flexWrap:"wrap",gap:".4rem"}}>
+                {EMOJIS.map(em=>(<span key={em} onClick={()=>setForm({...form,emoji:em})} style={{cursor:"pointer",fontSize:"1.5rem",padding:".2rem",borderRadius:6,background:form.emoji===em?"var(--green-100)":"transparent",border:form.emoji===em?"2px solid var(--green-500)":"2px solid transparent"}}>{em}</span>))}
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+              <div className="form-group"><label>Price (₹) *</label><input type="number" value={form.price} onChange={e=>setForm({...form,price:e.target.value})} placeholder="0" /></div>
+              <div className="form-group"><label>Unit</label><select value={form.unit} onChange={e=>setForm({...form,unit:e.target.value})}><option>kg</option><option>piece</option><option>bunch</option><option>dozen</option><option>litre</option></select></div>
+              <div className="form-group"><label>Stock *</label><input type="number" value={form.stock} onChange={e=>setForm({...form,stock:e.target.value})} placeholder="0" /></div>
+              <div className="form-group"><label>Category</label><select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}><option>Vegetables</option><option>Fruits</option><option>Leafy Greens</option></select></div>
+            </div>
+            <div className="form-group"><label>Description</label><textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} /></div>
+            <div className="form-group" style={{display:"flex",alignItems:"center",gap:".5rem"}}>
+              <input type="checkbox" id="org" checked={form.organic} onChange={e=>setForm({...form,organic:e.target.checked})} style={{width:"auto"}} />
+              <label htmlFor="org" style={{marginBottom:0}}>🌿 Organic Product</label>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={()=>setShowModal(false)}>Cancel</button>
+              <button className="btn-sm btn-sm-primary" style={{flex:1,padding:".75rem",fontSize:".95rem"}} onClick={saveProd}>{editProd?"Save Changes":"Add Product"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// ADMIN DASHBOARD
+// ══════════════════════════════════════════════════════
+function AdminDash({users,setUsers,products,setProducts,orders,setOrders,notify}) {
+  const [tab, setTab] = useState("verify");
+  const farmers   = users.filter(u=>u.role==="farmer");
+  const consumers = users.filter(u=>u.role==="consumer");
+  const pending   = farmers.filter(f=>!f.verified);
+  const revenue   = orders.filter(o=>o.status==="Delivered").reduce((s,o)=>s+o.total,0);
+
+  const verify  = id => { setUsers(us=>us.map(u=>u.id===id?{...u,verified:true}:u)); notify("Farmer verified!","✅"); };
+  const reject  = id => { if(confirm("Reject & remove this farmer?")){ setUsers(us=>us.filter(u=>u.id!==id)); notify("Farmer removed","🗑"); } };
+  const delProd = id => { if(confirm("Remove this product?")){ setProducts(ps=>ps.filter(p=>p.id!==id)); notify("Product removed","🗑"); } };
+  const updOrd  = (id,status) => { setOrders(os=>os.map(o=>o.id===id?{...o,status}:o)); notify(`Order → ${status}`,"📦"); };
+
+  return (
+    <div>
+      <div className="page-header"><h1>Admin Dashboard ⚙️</h1><p>Manage the KisanMart platform</p></div>
+      <div className="container section">
+        <div className="dash-grid">
+          <div className="dash-card"><div className="dash-card-icon">🌾</div><div className="dash-card-val">{farmers.length}</div><div className="dash-card-label">Total Farmers</div></div>
+          <div className="dash-card"><div className="dash-card-icon">⏳</div><div className="dash-card-val" style={{color:"var(--amber-500)"}}>{pending.length}</div><div className="dash-card-label">Pending Verification</div></div>
+          <div className="dash-card"><div className="dash-card-icon">👥</div><div className="dash-card-val">{consumers.length}</div><div className="dash-card-label">Consumers</div></div>
+          <div className="dash-card"><div className="dash-card-icon">📦</div><div className="dash-card-val">{products.length}</div><div className="dash-card-label">Products</div></div>
+          <div className="dash-card"><div className="dash-card-icon">🛒</div><div className="dash-card-val">{orders.length}</div><div className="dash-card-label">Total Orders</div></div>
+          <div className="dash-card"><div className="dash-card-icon">💰</div><div className="dash-card-val">₹{revenue}</div><div className="dash-card-label">Platform Revenue</div></div>
+        </div>
+        <div className="tabs">
+          {[["verify","Verify Farmers"],["users","All Users"],["products","Products"],["orders","Orders"]].map(([k,v])=>(
+            <button key={k} className={`tab ${tab===k?"active":""}`} onClick={()=>setTab(k)}>
+              {v}{k==="verify"&&pending.length>0&&<span className="cart-badge" style={{position:"static",marginLeft:".4rem",background:"var(--amber-500)",display:"inline-flex"}}>{pending.length}</span>}
+            </button>
+          ))}
+        </div>
+        {tab==="verify"&&(<>
+          <h3 style={{marginBottom:"1rem"}}>Pending Farmer Verification ({pending.length})</h3>
+          {pending.length===0?<div className="empty-state"><div className="empty-state-icon">✅</div><p>All farmers verified!</p></div>:(
+            <div className="table-wrap"><table className="data-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Location</th><th>Joined</th><th>Actions</th></tr></thead>
+              <tbody>{pending.map(f=>(<tr key={f.id}><td><strong>{f.name}</strong></td><td>{f.email}</td><td>{f.location||"—"}</td><td>{f.joinDate}</td><td><div className="action-bar"><button className="btn-sm btn-sm-primary" onClick={()=>verify(f.id)}>Verify ✓</button><button className="btn-sm btn-sm-danger" onClick={()=>reject(f.id)}>Reject ✗</button></div></td></tr>))}</tbody>
+            </table></div>
+          )}
+        </>)}
+        {tab==="users"&&(
+          <div className="table-wrap"><table className="data-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th></tr></thead>
+            <tbody>{users.map(u=>(<tr key={u.id}><td><strong>{u.name}</strong></td><td>{u.email}</td><td><span className="chip">{u.role}</span></td><td><span className={`status-badge ${u.verified?"status-verified":"status-unverified"}`}>{u.verified?"Verified":"Pending"}</span></td><td>{u.joinDate}</td></tr>))}</tbody>
+          </table></div>
+        )}
+        {tab==="products"&&(
+          <div className="table-wrap"><table className="data-table">
+            <thead><tr><th>Product</th><th>Farmer</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+            <tbody>{products.map(p=>(<tr key={p.id}><td><span style={{fontSize:"1.2rem",marginRight:".5rem"}}>{p.emoji}</span><strong>{p.name}</strong></td><td>{p.farmerName}</td><td>₹{p.price}/{p.unit}</td><td>{p.stock}</td><td><button className="btn-sm btn-sm-danger" onClick={()=>delProd(p.id)}>Remove</button></td></tr>))}</tbody>
+          </table></div>
+        )}
+        {tab==="orders"&&(
+          <div className="table-wrap"><table className="data-table">
+            <thead><tr><th>Order ID</th><th>Consumer</th><th>Total</th><th>Payment</th><th>Status</th><th>Update</th></tr></thead>
+            <tbody>{orders.length===0?<tr><td colSpan={6} style={{textAlign:"center",color:"var(--text-muted)",padding:"2rem"}}>No orders yet</td></tr>
+              :orders.map(o=>(<tr key={o.id}><td><strong>{o.id}</strong></td><td>{o.consumerName}</td><td>₹{o.total}</td>
+                <td><span style={{fontSize:".8rem"}}>{o.paymentMethod||"—"} {o.paymentStatus&&<span className={`status-badge ${o.paymentStatus==="Paid"?"status-paid":"status-pending"}`} style={{marginLeft:".3rem"}}>{o.paymentStatus}</span>}</span></td>
+                <td><span className={`status-badge status-${o.status.toLowerCase().replace(/ /g,"-")}`}>{o.status}</span></td>
+                <td><select style={{padding:".3rem .5rem",fontSize:".8rem",border:"1px solid var(--border)",borderRadius:6,fontFamily:"inherit"}} value={o.status} onChange={e=>updOrd(o.id,e.target.value)}>
+                  {["Processing","Dispatched","Out for Delivery","Delivered"].map(s=><option key={s}>{s}</option>)}
+                </select></td>
+              </tr>))
+            }</tbody>
+          </table></div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// PROFILE PAGE
+// ══════════════════════════════════════════════════════
+function ProfilePage({currentUser,logout,setPage,orders}) {
+  const myOrders = orders.filter(o=>o.consumerId===currentUser?.id);
+  return (
+    <div>
+      <div className="page-header"><h1>My Profile 👤</h1><p>Your account details</p></div>
+      <div className="container section">
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:"1.5rem"}}>
+          <div className="dash-card">
+            <div style={{display:"flex",gap:"1rem",alignItems:"center",marginBottom:"1.5rem"}}>
+              <div style={{width:64,height:64,borderRadius:"50%",background:"var(--green-500)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.8rem",fontWeight:700,color:"#fff"}}>{currentUser?.name[0]}</div>
+              <div>
+                <div style={{fontWeight:700,fontSize:"1.2rem"}}>{currentUser?.name}</div>
+                <div style={{color:"var(--text-muted)",fontSize:".9rem"}}>{currentUser?.email}</div>
+                <span className="chip">{currentUser?.role}</span>
+              </div>
+            </div>
+            <div style={{color:"var(--text-muted)",fontSize:".9rem",lineHeight:1.8}}>
+              <div>📅 Joined: {currentUser?.joinDate}</div>
+              {currentUser?.location&&<div>📍 {currentUser?.location}</div>}
+            </div>
+          </div>
+          {currentUser?.role==="consumer"&&(
+            <div className="dash-card">
+              <h3 style={{marginBottom:"1rem"}}>Order Summary</h3>
+              <div><div className="dash-card-val">{myOrders.length}</div><div className="dash-card-label">Total Orders</div></div>
+              <div style={{marginTop:".75rem"}}><div className="dash-card-val">₹{myOrders.reduce((s,o)=>s+o.total,0)}</div><div className="dash-card-label">Total Spent</div></div>
+              <button className="btn btn-outline" style={{marginTop:"1rem"}} onClick={()=>setPage("orders")}>View Orders →</button>
+            </div>
+          )}
+        </div>
+        <button className="btn btn-primary" style={{width:"auto",marginTop:"2rem",padding:".75rem 2rem",background:"var(--red-500)"}} onClick={logout}>Logout</button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+</script>
+</body>
+</html>
